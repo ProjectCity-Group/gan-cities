@@ -9,8 +9,9 @@ class CityGenerator():
     Args:
       folder: Folder in which training maps are contained
     """
+    print(folder)
 
-  def setHeightmap(self, map: List[int]) -> None:
+  def setHeightmap(self, map: list) -> None:
     """
     Load a PNG heightmap representing terrain to generate a city on top of.
 
@@ -19,7 +20,7 @@ class CityGenerator():
     """
     pass
 
-  def getParams(self) -> Dict[str, any]:
+  def getParams(self) -> dict:
     """
     Get parameters currently associated with the generator
     """
@@ -33,14 +34,14 @@ class CityGenerator():
     """
     pass
 
-  def getValidCountries(self) -> List[str]:
+  def getValidCountries(self) -> list:
     """
     Return a list of countries whose cities the generator was trained on
 
     Return:
       List[str]: List of countries names
     """
-    pass
+    return ['USA', 'Taiwan']
 
   def setCityPop(self, pop: int) -> None:
     """
@@ -59,7 +60,7 @@ class CityGenerator():
     """
     pass
 
-  def generatePng(self) -> List[int]:
+  def generatePng(self) -> list:
     """
     Generate a PNG map of given size
 
