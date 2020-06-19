@@ -1,3 +1,5 @@
+from typing import List, Dict
+
 class CityGenerator():
   """
   City generator class
