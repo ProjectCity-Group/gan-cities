@@ -33,6 +33,15 @@ class CityGenerator():
     """
     pass
 
+  def getValidCountries(self) -> List[str]:
+    """
+    Return a list of countries whose cities the generator was trained on
+
+    Return:
+      List[str]: List of countries names
+    """
+    pass
+
   def setCityPop(self, pop: int) -> None:
     """
     Set the population of the generated city
