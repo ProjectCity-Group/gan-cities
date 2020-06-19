@@ -10,12 +10,12 @@ class CityGenerator():
       folder: Folder in which training maps are contained
     """
 
-  def setHeightmap(self, map: List[int]) -> None:
+  def setHeightmapPng(self, map: List[int]) -> None:
     """
     Load a PNG heightmap representing terrain to generate a city on top of.
 
     Args:
-      map: A list of integers representing a black and white heightmap ranging from 0-255
+      map: A list of integers representing a PNG heightmap in RGBA format.
     """
     pass
 
