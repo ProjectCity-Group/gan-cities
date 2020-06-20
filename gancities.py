@@ -1,3 +1,5 @@
+from typing import List, Dict
+
 class CityGenerator():
   """
   City generator class
@@ -9,18 +11,16 @@ class CityGenerator():
     Args:
       folder: Folder in which training maps are contained
     """
-    print(folder)
 
-  def setHeightmap(self, map: list) -> None:
+  def setHeightmapPng(self, map: List[int]) -> None:
     """
     Load a PNG heightmap representing terrain to generate a city on top of.
-
     Args:
-      map: A list of integers representing a black and white heightmap ranging from 0-255
+      map: A list of integers representing a PNG heightmap in RGBA format.
     """
     pass
 
-  def getParams(self) -> dict:
+  def getParams(self) -> Dict[str, any]:
     """
     Get parameters currently associated with the generator
     """
@@ -34,10 +34,9 @@ class CityGenerator():
     """
     pass
 
-  def getValidCountries(self) -> list:
+  def getValidCountries(self) -> List[str]:
     """
     Return a list of countries whose cities the generator was trained on
-
     Return:
       List[str]: List of countries names
     """
@@ -60,10 +59,9 @@ class CityGenerator():
     """
     pass
 
-  def generatePng(self) -> list:
+  def generatePng(self) -> List[int]:
     """
     Generate a PNG map of given size
-
     Returns:
       A list of integers representing pixel values in RGBA format
     """
