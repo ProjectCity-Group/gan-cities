@@ -61,11 +61,18 @@ class CityGenerator():
     """
     pass
 
-  def generatePng(self) -> List[int]:
+  def generateMap(self) -> None:
     """
     Generate a PNG map of given size
+    """
+    pass
+
+  def getGeneratedMap(self) -> List[int]:
+    """
+    Get the RGBA map data for the previously generated map.
 
     Returns:
       A list of integers representing pixel values in RGBA format
     """
     pass
+
