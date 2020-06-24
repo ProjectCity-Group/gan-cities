@@ -42,7 +42,7 @@ class CityGenerator():
     Return:
       List[str]: List of countries names
     """
-    pass
+    return ['USA', 'Canada', 'China'] # Placeholder
 
   def setCityPop(self, pop: int) -> None:
     """
