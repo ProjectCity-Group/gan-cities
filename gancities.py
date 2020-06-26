@@ -1,4 +1,8 @@
 from typing import List, Dict
+import numpy as np
+
+# Placeholder imports
+import imageio
 
 class CityGenerator():
   """
@@ -69,10 +73,15 @@ class CityGenerator():
 
   def getGeneratedMap(self) -> List[int]:
     """
-    Get the RGBA map data for the previously generated map.
+    Get the RGB map data for the previously generated map.
 
     Returns:
-      A list of integers representing pixel values in RGBA format
+      A list of integers representing pixel values in RGB format
     """
-    pass
+    # Placeholder image loading
+    image = imageio.imread('placeholder/placeholder_map.png')
+    image = np.array(image)
 
+    # Image is in RGBA format, strip alpha channel
+    imageRgb = image[:, :, :3]
+    return imageRgb
