@@ -83,3 +83,11 @@ class CityGenerator():
     # Image is in RGBA format, strip alpha channel
     imageRgb = image[:, :, :3]
     return imageRgb
+
+  def saveGeneratedMap(self, data, filename):
+    """
+    Take a numpy array previously generated and saves as a PNG file 
+    to the location specified by filename. filename should expect a complete
+    URI, including file:///
+   """
+  pass

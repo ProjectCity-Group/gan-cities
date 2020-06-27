@@ -4,12 +4,14 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 import gancities
 
 
+
 class GanCities(Gtk.Window):
     def __init__(self):
         super(GanCities, self).__init__()
         self.generator = gancities.CityGenerator()
         self.countries = self.generator.getValidCountries()
-        self.pixbuf = GdkPixbuf.Pixbuf.new_from_file("gui_placeholder_images/sample.png")
+        self.map_data = []
+        self.pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 400, 400)
         self.initialize_ui()
         self.load_image()
 
@@ -40,7 +42,6 @@ class GanCities(Gtk.Window):
         # Country Style Combobox
         self.country_model = Gtk.ListStore(str)
         for country in self.generator.getValidCountries():
-            print([country])
             self.country_model.append([country])
         self.country_style=Gtk.ComboBox(model=self.country_model)
         cell = Gtk.CellRendererText()
@@ -67,12 +68,18 @@ class GanCities(Gtk.Window):
         # Make Map button
         self.button = Gtk.Button(label="Make a map")
         self.button.connect("clicked", self.on_button_clicked)
+        # Save Map
+        self.save_button = Gtk.Button(label="Save Map")
+        self.save_button.connect("clicked", self.save_map)
+        self.save_button.set_sensitive(False)
+
         # Packing
         self.options_box.pack_start(self.train_box, True, True, 10)
         self.options_box.pack_start(self.country_style, False, False, 10)
         self.options_box.pack_start(self.popspinner, True, True, 10)
         self.options_box.pack_start(self.dim_box, True, True, 10)
         self.options_box.pack_start(self.button, True, True, 10)
+        self.options_box.pack_start(self.save_button, True, True, 10)
         self.add(self.horiz_box)
         self.show_all()
 
@@ -92,13 +99,33 @@ class GanCities(Gtk.Window):
         cr.paint()
 
     def on_button_clicked(self, widget):
-        print("Making a " + str(self.countries[self.country_style.get_active()]) + " style map.")
-        print("This map will have " + str(self.popspinner.get_value()) + " set as the population.")
-        print("This map will be " + str(self.xspinner.get_value()) + "x" + str(self.yspinner.get_value()))
+        x_dim = self.xspinner.get_value()
+        y_dim = self.yspinner.get_value()
+        self.generator.setDimensions(x_dim, y_dim)
+        self.generator.setCityPop(self.popspinner.get_value())
+        self.generator.setCountryStyle(self.countries[self.country_style.get_active()])
+        self.generator.generateMap()
+        self.map_data = self.generator.getGeneratedMap()
+        self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_data.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
+        self.save_button.set_sensitive(True)
 
     def train_clicked(self, widget, generator, chooser):
         if chooser.get_file() is not None:
             generator.train(chooser.get_file().get_uri())
+
+    def save_map(self, widget):
+        save_dialog = Gtk.FileChooserDialog(title="Save Map", action=Gtk.FileChooserAction.SAVE)
+        save_dialog.add_buttons(Gtk.STOCK_SAVE, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+        save_dialog.connect("response", self.save_response)
+        save_dialog.run()
+
+    def save_response(self, dialog, response):
+        if response == Gtk.ResponseType.OK:
+            filename = dialog.get_filename()
+            self.generator.saveGeneratedMap(self.map_data, filename)
+        dialog.destroy()
+
+
 def main():
     application = GanCities()
     Gtk.main()
