@@ -1,13 +1,14 @@
 import keras
 import numpy
 import os
+import pathlib
 
 class pix2pix_citygen():
 	#pix2pix city generator class
 
 	def __init__(self):
 		#loads the model 
-		self.__model = keras.models.load_model(os.getcwd() + r"\CityGenModel\g_model_040440.h5")
+		self.__model = keras.models.load_model(pathlib.Path("./CityGenModel/g_model_040440.h5").absolute())
 		
 
 	def loadImage(self, folder: str):
@@ -35,7 +36,6 @@ class pix2pix_citygen():
 		img = self.__model.predict(self.__input_pic)
 		img = (img + 1) / 2.0
 		img = numpy.squeeze(img,0)
-		print("in genImage: "+ str(img.shape))
 		return img
 
 	def saveImage(self, img,folder: str):
