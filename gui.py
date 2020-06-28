@@ -147,9 +147,13 @@ class GanCities(Gtk.Window):
         save_dialog.run()
 
     def save_response(self, dialog, response):
+        current_page = self.options_book.get_current_page()
         if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
-            self.generator.saveGeneratedMap(self.map_data, filename)
+            if current_page == 0:
+                self.generator.saveGeneratedMap(self.map_data, filename)
+            elif current_page == 1:
+                self.pix2pix.saveImage(self.map_data, filename)
         dialog.destroy()
 
     def on_load_clicked(self, widget):
