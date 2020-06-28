@@ -4,19 +4,16 @@ from keras.models import load_model
 from numpy import load
 from numpy import expand_dims
 import cv2
-
+import os
 
 class pix2pix_citygen():
 	#pix2pix city generator class
 
 	def __init__(self):
 		#loads the model
-		self.__model = load_model(self.__filename_model)
-		self.__filename_model = ".\gan-cities\CityGenModel\g_model_040440.h5"
-		self.__input_pic
-		self__output_pic
+		self.__model = load_model(os.getcwd()+ r"\CityGenModel\g_model_040440.h5")
 
-	def loadImage(self, folder: str) -> img:
+	def loadImage(self, folder: str):
 		"""
 		loads an image and returns a numpy array and sets the array to an internal var
 		Args:
@@ -32,7 +29,7 @@ class pix2pix_citygen():
 		return img
 	
 
-	def genImage(self) -> img:
+	def genImage(self):
 		"""
 		generates an image from __input_pic
 		Return:
