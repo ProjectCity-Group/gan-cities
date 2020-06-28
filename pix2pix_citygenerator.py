@@ -3,6 +3,7 @@ from keras.preprocessing.image import img_to_array
 from keras.models import load_model
 from numpy import load
 from numpy import expand_dims
+import cv2
 
 
 class pix2pix_citygen():
@@ -15,7 +16,7 @@ class pix2pix_citygen():
         #loads the model
         self.__model = load_model(self.__filename_model)
 
-    def loadImage(self, folder: str) -> img:
+    def loadImage(self, filename: str) -> img:
         """
 		loads an image and returns a numpy array and sets the array to an internal var
 		Args:
