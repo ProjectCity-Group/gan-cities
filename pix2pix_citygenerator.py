@@ -1,17 +1,14 @@
-from keras.preprocessing.image import load_img
-from keras.preprocessing.image import img_to_array
-from keras.models import load_model
-from numpy import load
-from numpy import expand_dims
-import cv2
+import keras
+import numpy
 import os
 
 class pix2pix_citygen():
 	#pix2pix city generator class
 
 	def __init__(self):
-		#loads the model
-		self.__model = load_model(os.getcwd()+ r"\CityGenModel\g_model_040440.h5")
+		#loads the model 
+		self.__model = keras.models.load_model(os.getcwd() + r"\CityGenModel\g_model_040440.h5")
+		
 
 	def loadImage(self, folder: str):
 		"""
@@ -21,11 +18,11 @@ class pix2pix_citygen():
 		Return:
 			
 		"""
-		img = load_img(folder, target_size=(256,256))
-		img = img_to_array(img)
+		img = keras.preprocessing.image.load_img(folder, target_size=(256,256))
+		img = keras.preprocessing.image.img_to_array(img)
 		img = (img - 127.5) / 127.5
-		img = expand_dims(img, 0)
-		self.__input_pic = img
+		img_plus = numpy.expand_dims(img, 0)
+		self.__input_pic = img_plus
 		return img
 	
 
@@ -36,6 +33,9 @@ class pix2pix_citygen():
 			img: an numpy array
 		"""
 		img = self.__model.predict(self.__input_pic)
+		img = (img + 1) / 2.0
+		img = numpy.squeeze(img,0)
+		print("in genImage: "+ str(img.shape))
 		return img
 
 	def saveImage(self, img,folder: str):
@@ -45,4 +45,5 @@ class pix2pix_citygen():
 			img: an numpy array
 			folder: Folder for saving the numpy array
 		"""
-		cv2.imwrite(folder,img)
+		img = keras.preprocessing.image.array_to_img(img)
+		keras.preprocessing.image.save_img(folder,img)
