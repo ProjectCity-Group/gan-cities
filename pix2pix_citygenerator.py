@@ -8,7 +8,7 @@ class pix2pix_citygen():
 
 	def __init__(self):
 		#loads the model 
-		self.__model = keras.models.load_model(pathlib.Path("./CityGenModel/g_model_040440.h5").absolute())
+		self.__model = keras.models.load_model(pathlib.Path("./CitygenModel/g_model_040440.h5").absolute())
 		
 
 	def loadImage(self, folder: str):
