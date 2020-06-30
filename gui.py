@@ -1,16 +1,19 @@
 import gi
+import imageio
+import numpy as np
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf
-import gancities
+from citygan import CityGan
 import pix2pix_citygenerator
 
 
 class GanCities(Gtk.Window):
     def __init__(self):
         super(GanCities, self).__init__()
-        self.generator = gancities.CityGenerator()
+        self.generator = CityGan()
+        self.generator.initialize()
         self.pix2pix = pix2pix_citygenerator.pix2pix_citygen()
-        self.countries = self.generator.getValidCountries()
+        #self.countries = self.generator.getValidCountries()
         self.current_model=0
         self.map_data = []
         self.pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 400, 400)
@@ -47,15 +50,15 @@ class GanCities(Gtk.Window):
         #self.train_box.pack_start(self.train_folder_select, False, False, 10)
         #self.train_box.pack_start(self.train_button,True, True, 10)
         # Country Style Combobox
-        self.country_model = Gtk.ListStore(str)
-        for country in self.countries:
-            self.country_model.append([country])
-        self.country_style = Gtk.ComboBox(model=self.country_model)
-        country_cell = Gtk.CellRendererText()
-        self.country_style.pack_start(country_cell, False)
-        self.country_style.add_attribute(country_cell, "text", 0)
-        self.country_style.set_entry_text_column(0)
-        self.country_style.set_active(0)
+        #self.country_model = Gtk.ListStore(str)
+        #for country in self.countries:
+        #    self.country_model.append([country])
+        #self.country_style = Gtk.ComboBox(model=self.country_model)
+        #country_cell = Gtk.CellRendererText()
+        #self.country_style.pack_start(country_cell, False)
+        #self.country_style.add_attribute(country_cell, "text", 0)
+        #self.country_style.set_entry_text_column(0)
+        #self.country_style.set_active(0)
         # Population Spin Button
         pop_adjustment = Gtk.Adjustment(value=1000, lower=1000, upper=10000000, step_increment=1000)
         self.popspinner = Gtk.SpinButton(numeric=True)
@@ -91,9 +94,9 @@ class GanCities(Gtk.Window):
 
         # Packing
         #self.options_box.pack_start(self.train_box, True, True, 10)
-        self.gan_options_box.pack_start(self.country_style, False, False, 10)
-        self.gan_options_box.pack_start(self.popspinner, False, True, 10)
-        self.gan_options_box.pack_start(self.dim_box, False, True, 10)
+        #self.gan_options_box.pack_start(self.country_style, False, False, 10)
+        #self.gan_options_box.pack_start(self.popspinner, False, True, 10)
+        #self.gan_options_box.pack_start(self.dim_box, False, True, 10)
         self.gan_options_box.pack_start(self.gan_generate_button, False, True, 10)
         self.gan_options_box.pack_end(self.gan_save_button, False, True, 10)
         self.pix2pix_options_box.pack_start(self.load_button, False, True, 10)
@@ -118,22 +121,30 @@ class GanCities(Gtk.Window):
         cr.paint()
 
     def gan_generate(self, widget):
-        x_dim = self.xspinner.get_value()
-        y_dim = self.yspinner.get_value()
-        self.generator.setDimensions(x_dim, y_dim)
-        self.generator.setCityPop(self.popspinner.get_value())
-        self.generator.setCountryStyle(self.countries[self.country_style.get_active()])
-        self.generator.generateMap()
-        self.map_data = self.generator.getGeneratedMap()
+        #x_dim = self.xspinner.get_value()
+        #y_dim = self.yspinner.get_value()
+        #self.generator.setDimensions(x_dim, y_dim)
+        #self.generator.setCityPop(self.popspinner.get_value())
+        #self.generator.setCountryStyle(self.countries[self.country_style.get_active()])
+        self.map_data = self.generator.generateMap()
+        #image = imageio.imread('placeholder/placeholder_map.png')
+        #image = np.array(image)
+        # Image is in RGBA format, strip alpha channel
+        #self.map_data = image[:, :, :3]
+        print(self.map_data)
         self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_data.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
         self.gan_save_button.set_sensitive(True)
         self.pix2pix_save_button.set_sensitive(False)
+        allocation = self.image_area.get_allocation()
+        self.resizeImage(allocation.width, allocation.height)
 
     def pix2pix_generate(self, widget):
         self.map_data = self.pix2pix.genImage()
         self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_data.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
         self.pix2pix_save_button.set_sensitive(True)
         self.gan_save_button.set_sensitive(False)
+        allocation = self.image_area.get_allocation()
+        self.resizeImage(allocation.width, allocation.height)
 
 
     def train_clicked(self, widget, generator, chooser):
