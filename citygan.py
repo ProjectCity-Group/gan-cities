@@ -177,7 +177,7 @@ class CityGan:
     def generateMap(self):
         latent = self.generateLatentPoints(1)
         maps = self.generator.predict(latent)
-        maps = self.mapRangeToRange(maps, [-1, 1], [0, 1])
+        maps = self.mapRangeToRange(maps, [-1, 1], [0, 255]).astype(int)
         return maps[0]
 
     def getRealMaps(self, numSamples):
