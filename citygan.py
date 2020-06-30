@@ -23,6 +23,8 @@ from keras.layers import Conv2DTranspose
 from keras.layers import AveragePooling2D
 from keras.layers import ReLU
 
+from util import mapRangeToRange
+
 from keras.optimizers import RMSprop
 from keras.optimizers import Adam
 
@@ -56,7 +58,7 @@ class CityGan:
             data.append(data)
 
         self.mapData = np.array(data)
-        self.mapData = self.mapRangeToRange(self.mapData, [0, 255], [-1, 1])
+        self.mapData = mapRangeToRange(self.mapData, [0, 255], [-1, 1])
 
     def loadMapsFromNpy(self, file):
         self.mapData = np.load(file)
@@ -65,11 +67,6 @@ class CityGan:
     def loadModel(self, file):
         self.generator = load_model(file)
         self.generator.compile()
-
-    def mapRangeToRange(self, inputNum, inputRange, outputRange):
-        inputRangeVal = inputRange[1] - inputRange[0]
-        outputRangeVal = outputRange[1] - outputRange[0]
-        return (inputNum - inputRange[0]) / inputRangeVal * outputRangeVal + outputRange[0]
 
     def initializeDiscriminator(self):
         discriminatorInput = Input(shape=self.mapDimensions)
@@ -171,13 +168,13 @@ class CityGan:
         latent = self.generateLatentPoints(num)
         maps = self.generator.predict(latent)
         if mapRange:
-            maps = self.mapRangeToRange(maps, [-1, 1], [0, 1])
+            maps = mapRangeToRange(maps, [-1, 1], [0, 1])
         return maps
 
     def generateMap(self):
         latent = self.generateLatentPoints(1)
         maps = self.generator.predict(latent)
-        maps = self.mapRangeToRange(maps, [-1, 1], [0, 255]).astype(int)
+        maps = mapRangeToRange(maps, [-1, 1], [0, 255]).astype(int)
         return maps[0]
 
     def getRealMaps(self, numSamples):
