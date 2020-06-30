@@ -8,7 +8,6 @@ from keras import backend
 from keras.models import Model
 from keras.models import Sequential
 from keras.models import load_model
-
 from keras.layers import Conv2D
 from keras.layers import Input
 from keras.layers import Flatten
@@ -48,7 +47,7 @@ class CityGan:
 
         self.numChannels = 3
 
-        self.mapDimensions = None
+        self.mapDimensions = (128, 128, 3)
 
     def loadMapsFromDir(self, dirName):
         data = []
@@ -178,7 +177,7 @@ class CityGan:
     def generateMap(self, ):
         latent = self.generateLatentPoints(1)
         maps = self.generator.predict(latent)
-        maps = int(self.mapRangeToRange(maps, [-1, 1], [0, 255]))
+        maps = self.mapRangeToRange(maps, [-1, 1], [0, 1])
         return maps[0]
 
     def getRealMaps(self, numSamples):
