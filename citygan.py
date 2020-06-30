@@ -62,7 +62,6 @@ class CityGan:
     def loadMapsFromNpy(self, file):
         self.mapData = np.load(file)
         self.mapDimensions = self.mapData[0].shape
-        print(f'Map dimensions: {self.mapDimensions}')
 
     def loadModel(self, file):
         self.generator = load_model(file)
@@ -169,12 +168,18 @@ class CityGan:
         xInput = xInput.reshape(numSamples, self.latentDimensions)
         return xInput
 
-    def generate(self, num=1, mapRange=True):
+    def generateMapSamples(self, num=1, mapRange=True):
         latent = self.generateLatentPoints(num)
         maps = self.generator.predict(latent)
         if mapRange:
             maps = self.mapRangeToRange(maps, [-1, 1], [0, 1])
         return maps
+
+    def generateMap(self, ):
+        latent = self.generateLatentPoints(1)
+        maps = self.generator.predict(latent)
+        maps = int(self.mapRangeToRange(maps, [-1, 1], [0, 255]))
+        return maps[0]
 
     def getRealMaps(self, numSamples):
         idx = randint(0, self.mapData.shape[0], numSamples)
@@ -188,7 +193,7 @@ class CityGan:
             for j in range(batchesPerEpoch):
                 numSamples = int(batchSize / 2)
                 self.discriminator.train_on_batch(self.getRealMaps(numSamples), np.ones((numSamples, 1)))
-                self.discriminator.train_on_batch(self.generate(numSamples), np.zeros((numSamples, 1)))
+                self.discriminator.train_on_batch(self.generateMapSamples(numSamples), np.zeros((numSamples, 1)))
 
                 xGan = self.generateLatentPoints(batchSize)
                 yGan = np.ones((batchSize, 1))
