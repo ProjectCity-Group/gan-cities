@@ -8,7 +8,12 @@ class pix2pix_citygen():
 
 	def __init__(self):
 		#loads the model  /CitygenModel/g_model_040440.h5
-		self.__model = keras.models.load_model((pathlib.Path(__file__).parent / "../gan-cities/CitygenModel/g_model_040440.h5").resolve())
+		try:
+			self.__model = keras.models.load_model((pathlib.Path(__file__).parent / "../gan-cities/CitygenModel/g_model_040440.h5").resolve())
+			pass
+		except:
+			print("load model did not work. Check if model is in CitygenModel.")
+			pass
 		
 
 	def loadImage(self, folder: str):
