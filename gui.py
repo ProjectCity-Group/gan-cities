@@ -1,5 +1,7 @@
 import gi
 import numpy as np
+import util
+import time
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from citygan import CityGan
@@ -108,9 +110,11 @@ class GanCities(Gtk.Window):
         self.image_area.set_allocation(allocation)
         self.resizeImage(allocation.width, allocation.height)
 
-
     def resizeImage(self, x, y):
         self.scale_pixbuf = self.pixbuf.scale_simple(x, y, GdkPixbuf.InterpType.BILINEAR)
+        self.image_area.set_from_pixbuf(None)
+        self.image_area.queue_draw()
+
 
     def on_draw(self, win, cr):
         Gdk.cairo_set_source_pixbuf(cr, self.scale_pixbuf, 5, 5)
@@ -126,18 +130,19 @@ class GanCities(Gtk.Window):
         self.map_array = self.map_data.astype(np.uint8)
         self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
         self.gan_save_button.set_sensitive(True)
+        self.pix2pix_generate_button.set_sensitive(False)
         self.pix2pix_save_button.set_sensitive(False)
-        allocation = self.image_area.get_allocation()
-        self.resizeImage(allocation.width, allocation.height)
+        self.image_area.set_from_pixbuf(self.scale_pixbuf)
+
 
     def pix2pix_generate(self, widget):
         self.map_data = self.pix2pix.genImage()
-        self.map_array = self.map_data.astype(np.uint8)
+        self.map_array = util.mapRangeToRange(self.map_data, [0, 1], [0, 255]).astype(np.uint8)
         self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
+        self.scale_pixbuf = self.pixbuf
         self.pix2pix_save_button.set_sensitive(True)
         self.gan_save_button.set_sensitive(False)
-        allocation = self.image_area.get_allocation()
-        self.resizeImage(allocation.width, allocation.height)
+        self.image_area.set_from_pixbuf(self.scale_pixbuf)
 
 
     def train_clicked(self, widget, generator, chooser):
@@ -177,7 +182,6 @@ class GanCities(Gtk.Window):
             self.pix2pix_save_button.set_sensitive(True)
             self.pix2pix.loadImage(filename)
         dialog.destroy()
-
 
 def main():
     application = GanCities()
