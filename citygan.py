@@ -41,17 +41,21 @@ class CityGan:
         self.discriminatorLearningRate = 0.0002
         self.generatorLearningRate = 0.0002
 
-        self.mapData = None
+        self.__mapData = None
 
-        self.critic = None
-        self.generator = None
-        self.gan = None
+        self.__critic = None
+        self.__generator = None
+        self.__gan = None
 
-        self.numChannels = 3
+        self.__numChannels = 3
 
-        self.mapDimensions = (128, 128, 3)
+        self.__mapDimensions = (128, 128, 3)
 
     def initialize(self):
+        """
+        Initialize the GAN - should be called after either the model has been loaded
+        or training on a set of data has completed.
+        """
         self.__initializeGenerator()
         self.__initializeDiscriminator()
 
@@ -62,53 +66,79 @@ class CityGan:
         self.gan.compile(loss='binary_crossentropy', optimizer=Adam(lr=0.0002))
 
     def train(self, numEpochs=500, batchSize=128):
-        batchesPerEpoch = int(self.mapData.shape[0] / batchSize)
+        """
+        Train the GAN on a previously loaded set of data.
+        Args:
+            numEpochs: The number of epochs to train for
+            batchSize: The size of each training batch
+        """
+        batchesPerEpoch = int(self.__mapData.shape[0] / batchSize)
         for i in range(numEpochs):
             for j in range(batchesPerEpoch):
+                # Utilize half batch size to train discriminator
                 numSamples = int(batchSize / 2)
-                self.discriminator.train_on_batch(self.getRealMaps(numSamples), np.ones((numSamples, 1)))
-                self.discriminator.train_on_batch(self.generateMapSamples(numSamples), np.zeros((numSamples, 1)))
 
-                xGan = self.generateLatentPoints(batchSize)
+                # Train the discriminator
+                self.discriminator.train_on_batch(self.__getRealMaps(numSamples), np.ones((numSamples, 1)))
+                self.discriminator.train_on_batch(self.__generateMapSamples(numSamples), np.zeros((numSamples, 1)))
+
+                xGan = self.__generateLatentVector(batchSize)
                 yGan = np.ones((batchSize, 1))
 
                 generatorLoss = self.gan.train_on_batch(xGan, yGan)
             self.generator.save(f'models/epoch_{i}')
 
-    def loadModel(self, file):
+    def loadModel(self, filePath):
         """
-        Load model
+        Load a keras model
+        Args:
+            filePath: The location of the model
         """
-        self.generator = load_model(file)
-        self.generator.compile()
+        self.generator = load_model(filePath)
 
     def loadMapsFromDir(self, dirName):
+        """
+        Loads training data from a directory - all maps are expected to be in PNG uint8 RGBA format
+        Args:
+            dirName: The location of the folder in which the maps are located
+        """
         data = []
         for dataPath in glob.glob(f'data/{path}/*.png'):
             data = imageio.imread(imagePath)
             data.append(data)
 
-        self.mapData = np.array(data)
-        self.mapData = mapRangeToRange(self.mapData, [0, 255], [-1, 1])
+        self.__mapData = np.array(data)
+        self.__mapData = mapRangeToRange(self.__mapData, [0, 255], [-1, 1])
 
-    def loadMapsFromNpy_(self, file):
+    def loadMapsFromNpy_(self, filePath):
         """
-        Load map training data from numpy file.
+        Load map training data from numpy file
+        Args:
+            filePath
         """
-        self.mapData = np.load(file)
-        self.mapDimensions = self.mapData[0].shape
+        self.__mapData = np.load(filePath)
+        self.__mapDimensions = self.__mapData[0].shape
 
     def generateMap(self):
-        latent = self.__generateLatentPoints(1)
+        """
+        Generate a map in uint8 RGB format
+        """
+        latent = self.__generateLatentVector(1)
         maps = self.generator.predict(latent)
-        maps = mapRangeToRange(maps, [-1, 1], [0, 255]).astype(int)
+        maps = mapRangeToRange(maps, [-1, 1], [0, 255]).astype(np.uint8)
         return maps[0]
 
     def saveGeneratedMap(self, imageData, fileName):
+        """
+        Save a map in uint8 RGB format
+        """
         imageio.imwrite(fileName, imageData)
 
     def __initializeDiscriminator(self):
-        discriminatorInput = Input(shape=self.mapDimensions)
+        """
+        Set up and compile the discriminator model
+        """
+        discriminatorInput = Input(shape=self.__mapDimensions)
 
         discriminator = Conv2D(16, (3, 3), strides=(2,2), padding='same')(discriminatorInput)
         discriminator = LeakyReLU(alpha=0.2)(discriminator)
@@ -138,6 +168,9 @@ class CityGan:
         self.discriminator.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 
     def __initializeGenerator(self):
+        """
+        Setup without compiling the generator model
+        """
         PNG_DIM = 3
 
         startImageWidth = 4
@@ -188,12 +221,18 @@ class CityGan:
         self.generator = Model(generatorInput, generatorOutput)
         return generator
 
-    def __generateLatentPoints(self, numSamples):
+    def __generateLatentVector(self, numSamples):
+        """
+        Generates a random latent space vector to be fed into the generator
+        """
         xInput = randn(self.latentDimensions * numSamples)
         xInput = xInput.reshape(numSamples, self.latentDimensions)
         return xInput
 
     def __generateMapSamples(self, num=1, mapRange=True):
+        """
+        Generate map samples to feed into the discriminator
+        """
         latent = self.generateLatentPoints(num)
         maps = self.generator.predict(latent)
         if mapRange:
@@ -201,7 +240,11 @@ class CityGan:
         return maps
 
     def __getRealMaps(self, numSamples):
-        idx = randint(0, self.mapData.shape[0], numSamples)
+        """
+        Get real map samples to feed into discriminator
+
+        """
+        idx = randint(0, self.__mapData.shape[0], numSamples)
         x = self.mapData[idx]
         y = np.ones((numSamples, 1))
         return x, y
