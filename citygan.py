@@ -23,7 +23,7 @@ from keras.layers import Conv2DTranspose
 from keras.layers import AveragePooling2D
 from keras.layers import ReLU
 
-from util import mapRangeToRange
+from citygan_util import mapRangeToRange
 
 from keras.optimizers import RMSprop
 from keras.optimizers import Adam
@@ -51,6 +51,37 @@ class CityGan:
 
         self.mapDimensions = (128, 128, 3)
 
+    def initialize(self):
+        self.__initializeGenerator()
+        self.__initializeDiscriminator()
+
+        self.discriminator.trainable = False
+        self.gan = Sequential()
+        self.gan.add(self.generator)
+        self.gan.add(self.discriminator)
+        self.gan.compile(loss='binary_crossentropy', optimizer=Adam(lr=0.0002))
+
+    def train(self, numEpochs=500, batchSize=128):
+        batchesPerEpoch = int(self.mapData.shape[0] / batchSize)
+        for i in range(numEpochs):
+            for j in range(batchesPerEpoch):
+                numSamples = int(batchSize / 2)
+                self.discriminator.train_on_batch(self.getRealMaps(numSamples), np.ones((numSamples, 1)))
+                self.discriminator.train_on_batch(self.generateMapSamples(numSamples), np.zeros((numSamples, 1)))
+
+                xGan = self.generateLatentPoints(batchSize)
+                yGan = np.ones((batchSize, 1))
+
+                generatorLoss = self.gan.train_on_batch(xGan, yGan)
+            self.generator.save(f'models/epoch_{i}')
+
+    def loadModel(self, file):
+        """
+        Load model
+        """
+        self.generator = load_model(file)
+        self.generator.compile()
+
     def loadMapsFromDir(self, dirName):
         data = []
         for dataPath in glob.glob(f'data/{path}/*.png'):
@@ -60,15 +91,23 @@ class CityGan:
         self.mapData = np.array(data)
         self.mapData = mapRangeToRange(self.mapData, [0, 255], [-1, 1])
 
-    def loadMapsFromNpy(self, file):
+    def loadMapsFromNpy_(self, file):
+        """
+        Load map training data from numpy file.
+        """
         self.mapData = np.load(file)
         self.mapDimensions = self.mapData[0].shape
 
-    def loadModel(self, file):
-        self.generator = load_model(file)
-        self.generator.compile()
+    def generateMap(self):
+        latent = self.__generateLatentPoints(1)
+        maps = self.generator.predict(latent)
+        maps = mapRangeToRange(maps, [-1, 1], [0, 255]).astype(int)
+        return maps[0]
 
-    def initializeDiscriminator(self):
+    def saveGeneratedMap(self, imageData, fileName):
+        imageio.imwrite(fileName, imageData)
+
+    def __initializeDiscriminator(self):
         discriminatorInput = Input(shape=self.mapDimensions)
 
         discriminator = Conv2D(16, (3, 3), strides=(2,2), padding='same')(discriminatorInput)
@@ -98,7 +137,7 @@ class CityGan:
         self.discriminator = Model(discriminatorInput, discriminatorOutput)
         self.discriminator.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 
-    def initializeGenerator(self):
+    def __initializeGenerator(self):
         PNG_DIM = 3
 
         startImageWidth = 4
@@ -149,65 +188,20 @@ class CityGan:
         self.generator = Model(generatorInput, generatorOutput)
         return generator
 
-    def initialize(self):
-        self.initializeGenerator()
-        self.initializeDiscriminator()
-
-        self.discriminator.trainable = False
-        self.gan = Sequential()
-        self.gan.add(self.generator)
-        self.gan.add(self.discriminator)
-        self.gan.compile(loss='binary_crossentropy', optimizer=Adam(lr=0.0002))
-
-    def generateLatentPoints(self, numSamples):
+    def __generateLatentPoints(self, numSamples):
         xInput = randn(self.latentDimensions * numSamples)
         xInput = xInput.reshape(numSamples, self.latentDimensions)
         return xInput
 
-    def generateMapSamples(self, num=1, mapRange=True):
+    def __generateMapSamples(self, num=1, mapRange=True):
         latent = self.generateLatentPoints(num)
         maps = self.generator.predict(latent)
         if mapRange:
             maps = mapRangeToRange(maps, [-1, 1], [0, 1])
         return maps
 
-    def generateMap(self):
-        latent = self.generateLatentPoints(1)
-        maps = self.generator.predict(latent)
-        maps = mapRangeToRange(maps, [-1, 1], [0, 255]).astype(int)
-        return maps[0]
-
-    def getRealMaps(self, numSamples):
+    def __getRealMaps(self, numSamples):
         idx = randint(0, self.mapData.shape[0], numSamples)
         x = self.mapData[idx]
         y = np.ones((numSamples, 1))
         return x, y
-
-    def train(self, numEpochs=500, batchSize=128):
-        batchesPerEpoch = int(self.mapData.shape[0] / batchSize)
-        for i in range(numEpochs):
-            for j in range(batchesPerEpoch):
-                numSamples = int(batchSize / 2)
-                self.discriminator.train_on_batch(self.getRealMaps(numSamples), np.ones((numSamples, 1)))
-                self.discriminator.train_on_batch(self.generateMapSamples(numSamples), np.zeros((numSamples, 1)))
-
-                xGan = self.generateLatentPoints(batchSize)
-                yGan = np.ones((batchSize, 1))
-
-                generatorLoss = self.gan.train_on_batch(xGan, yGan)
-            self.generator.save(f'models/epoch_{i}')
-            self.saveGeneratedMaps(f'generated_maps/epoch_{i}.png', 3, 3)
-
-    def saveGeneratedMap(self, imageData, fileName):
-        imageio.imwrite(fileName, imageData)
-
-    def saveGeneratedMaps(self, fileName, columns, rows):
-        generatedMaps = []
-        for i in range(columns * rows):
-            generatedMaps.append(self.generateMap())
-
-        for i in range(columns * rows):
-            plt.subplot(columns, rows, i + 1)
-            plt.axis('off')
-            plt.imshow(generatedMaps[i])
-        plt.savefig(fileName)

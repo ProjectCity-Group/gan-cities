@@ -1,6 +1,6 @@
 import gi
 import numpy as np
-import util
+import citygan_util
 import time
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf
@@ -137,7 +137,7 @@ class GanCities(Gtk.Window):
 
     def pix2pix_generate(self, widget):
         self.map_data = self.pix2pix.genImage()
-        self.map_array = util.mapRangeToRange(self.map_data, [0, 1], [0, 255]).astype(np.uint8)
+        self.map_array = citygan_util.mapRangeToRange(self.map_data, [0, 1], [0, 255]).astype(np.uint8)
         self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
         self.scale_pixbuf = self.pixbuf
         self.pix2pix_save_button.set_sensitive(True)
@@ -186,7 +186,6 @@ class GanCities(Gtk.Window):
 def main():
     application = GanCities()
     Gtk.main()
-
 
 if __name__ == "__main__":
     main()
