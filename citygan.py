@@ -53,8 +53,7 @@ class CityGan:
 
     def initialize(self):
         """
-        Initialize the GAN - should be called after either the model has been loaded
-        or training on a set of data has completed.
+        Set up and compile the GAN - should be called before training on a set of data.
         """
         self.__initializeGenerator()
         self.__initializeDiscriminator()
