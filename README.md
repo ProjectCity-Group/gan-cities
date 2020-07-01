@@ -2,6 +2,10 @@
 
 A procedural city generator using generative adversarial networks.
 
+**NOTE**: In order to successfully clone this repository, Git LFS is required.
+After installing Git LFS and cloning this repository, run `git lfs pull`
+in order to ensure that the models are successfully downloaded.
+
 ## Usage
 
 ### Using the pre-built model
