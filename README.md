@@ -2,6 +2,10 @@
 
 A procedural city generator using generative adversarial networks.
 
+**NOTE**: In order to successfully clone this repository, Git LFS is required.
+After installing Git LFS and cloning this repository, run `git lfs pull`
+in order to ensure that the models are successfully downloaded.
+
 ## Usage
 
 ### Using the pre-built model
@@ -27,8 +31,10 @@ cityMap = cityGan.generateMap()
 ```
 
 ## GUI
-If on Windows, installing GTK via instructions provided here https://www.gtk.org/docs/installations/windows/
-should be sufficient along with installing pycario and PyGObject froom pip. 
+This library comes with a GUI demonstrating features of the library. Simply run `gui.py`.
 
-Full documentaiton on installing PyGobject can be found here: https://pygobject.readthedocs.io/en/latest/getting_started.html
+If on Windows, installing GTK via instructions provided here https://www.gtk.org/docs/installations/windows/
+should be sufficient along with installing pycairo and PyGObject from pip. 
+
+Full documentation on installing PyGObject can be found here: https://pygobject.readthedocs.io/en/latest/getting_started.html
 ![Screenshot of GanCities UI](https://raw.githubusercontent.com/ProjectCity-Group/gan-cities/master/screenshot/screenshot.png?token=ACHD5QBWEP3NRK2SNS6QEAK667B3O)
