@@ -198,6 +198,9 @@ class CityGan:
             self.generator.save(f'models/epoch_{i}')
             self.saveGeneratedMaps(f'generated_maps/epoch_{i}.png', 3, 3)
 
+    def saveGeneratedMap(self, imageData, fileName):
+        imageio.imwrite(fileName, imageData)
+
     def saveGeneratedMaps(self, fileName, columns, rows):
         generatedMaps = []
         for i in range(columns * rows):
