@@ -23,7 +23,7 @@ from keras.layers import Conv2DTranspose
 from keras.layers import AveragePooling2D
 from keras.layers import ReLU
 
-from util import mapRangeToRange
+from citygan_util import mapRangeToRange
 
 from keras.optimizers import RMSprop
 from keras.optimizers import Adam
