@@ -6,7 +6,9 @@ A procedural city generator using generative adversarial networks.
 
 ### Using the pre-built model
 ```python
-cityGan = CityGAN()
+from citygan import CityGan 
+
+cityGan = CityGan()
 cityGan.loadModel('models/citygan')
 
 cityMap = cityGan.generateMap()
@@ -14,7 +16,9 @@ cityMap = cityGan.generateMap()
 
 ### Training the model with your own data
 ```python
-cityGan = CityGAN()
+from citygan import CityGan
+
+cityGan = CityGan()
 cityGan.initialize()
 cityGan.loadMapsFromDir('maps')
 
