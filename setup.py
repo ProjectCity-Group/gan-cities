@@ -1,20 +1,20 @@
-from distutils.core import setup
+from setuptools import setup
 setup(
   name = 'citygan',
   packages = ['citygan'],
-  version = '0.1',
+  version = '0.1.4',
   license='MIT',
   description = 'Procedurally generated cities using generative adversarial networks',
   author = 'Thomas Allen, Eric Lehmann, Jacob Roberge, Christopher Ward, Adrian Wright',
   url = 'https://github.com/ProjectCity-Group/gan-cities',
-  download_url = 'https://github.com/ProjectCity-Group/gan-cities/archive/v0.1.tar.gz',
+  download_url = 'https://github.com/ProjectCity-Group/gan-cities/archive/v0.1.2.tar.gz',
   keywords = ['gan', 'city', 'procedural', 'generation'],
   install_requires=[
         'wheel',
         'imageio',
         'keras',
-        'matplotlib'
-        'numpy'
+        'matplotlib',
+        'numpy',
         'tensorflow'
       ],
   classifiers=[
