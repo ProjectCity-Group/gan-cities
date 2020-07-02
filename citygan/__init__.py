@@ -1,2 +1,1 @@
-from citygan import CityGan
-from pix2pix_citygenerator import pix2pix_citygen
+import citygan.citygan_util as citygan_util
