@@ -10,7 +10,7 @@ in order to ensure that the models are successfully downloaded.
 
 ### Using the pre-built model
 ```python
-from citygan import CityGan 
+from citygan.citygan import CityGan 
 
 cityGan = CityGan()
 cityGan.loadModel('models/citygan')
@@ -20,7 +20,7 @@ cityMap = cityGan.generateMap()
 
 ### Training the model with your own data
 ```python
-from citygan import CityGan
+from citygan.citygan import CityGan
 
 cityGan = CityGan()
 cityGan.initialize()
