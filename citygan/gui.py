@@ -1,8 +1,8 @@
 import gi
 import numpy as np
 import citygan_util
-import time
 gi.require_version("Gtk", "3.0")
+from threading import Thread
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from citygan import CityGan
 import pix2pix_citygenerator
@@ -125,12 +125,15 @@ class GanCities(Gtk.Window):
         Gdk.cairo_set_source_pixbuf(cr, self.scale_pixbuf, 5, 5)
         cr.paint()
 
+    def gan_make_map(self, widget):
+
     def gan_generate(self, widget):
         # x_dim = self.xspinner.get_value()
         # y_dim = self.yspinner.get_value()
         # self.generator.setDimensions(x_dim, y_dim)
         # self.generator.setCityPop(self.popspinner.get_value())
         # self.generator.setCountryStyle(self.countries[self.country_style.get_active()])
+        thread = Thread(target=self.generator.generateMap)
         self.map_data = self.generator.generateMap()
         self.map_array = self.map_data.astype(np.uint8)
         self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
