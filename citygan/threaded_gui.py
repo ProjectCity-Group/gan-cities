@@ -71,18 +71,18 @@ class GanCities(Gtk.Window):
         self.gan_generate_button = Gtk.Button(label="Make a map")
         self.gan_generate_button.connect("clicked", self.gan_generate_clicked)
         self.gan_save_button = Gtk.Button(label="Save Map")
-        # self.gan_save_button.connect("clicked", self.save_map)
+        self.gan_save_button.connect("clicked", self.save_map_clicked)
         self.gan_save_button.set_sensitive(False)
         self.pix2pix_save_button = Gtk.Button(label="Save Map")
-        # self.pix2pix_save_button.connect("clicked", self.save_map)
+        self.pix2pix_save_button.connect("clicked", self.save_map_clicked)
         self.pix2pix_save_button.set_sensitive(False)
         ## pix2pix Model
         # Load Image
         self.load_button = Gtk.Button(label="Load PNG")
-        # self.load_button.connect("clicked", self.on_load_clicked)
+        self.load_button.connect("clicked", self.on_load_clicked)
         # Generate Map
         self.pix2pix_generate_button = Gtk.Button(label="Make a Map")
-        # self.pix2pix_generate_button.connect("clicked", self.pix2pix_generate)
+        self.pix2pix_generate_button.connect("clicked", self.pix2pix_generate_clicked)
 
         # Packing
         self.gan_options_box.pack_start(self.gan_generate_button, False, True, 10)
@@ -119,10 +119,106 @@ class GanCities(Gtk.Window):
         self.pix2pix_save_button.set_sensitive(False)
         self.image_area.set_from_pixbuf(self.scale_pixbuf)
 
+    def save_map_clicked(self, widget):
+        self.q.put(self.save_map(widget))
+
+    def save_map(self, widget):
+        save_dialog = Gtk.FileChooserDialog(title="Save Map", action=Gtk.FileChooserAction.SAVE)
+        save_dialog.add_buttons(Gtk.STOCK_SAVE, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+        save_dialog.connect("response", self.save_response)
+        save_dialog.run()
+
+    def save_response(self, dialog, response):
+        current_page = self.options_book.get_current_page()
+        if response == Gtk.ResponseType.OK:
+            filename = dialog.get_filename()
+            if current_page == 0:  # NEEDS TO BE UPDATED IF ADDITIONAL MODELS ARE ADDED
+                self.generator.saveGeneratedMap(self.map_data, filename)
+            elif current_page == 1:
+                self.pix2pix.saveImage(self.map_data, filename)
+        dialog.destroy()
+
+    def on_load_clicked(self, widget):
+        self.q.put(self.on_load(widget))
+
+
+    def on_load(self, widget):
+        png_filter = Gtk.FileFilter()
+        png_filter.set_name("PNG File")
+        png_filter.add_mime_type("image/png")
+        load_dialog = Gtk.FileChooserDialog(title="Select a png", action=Gtk.FileChooserAction.OPEN)
+        load_dialog.add_buttons(Gtk.STOCK_OPEN, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+        load_dialog.add_filter(png_filter)
+        load_dialog.connect("response", self.load_response)
+        load_dialog.run()
+
+    def load_response(self, dialog, response):
+        if response == Gtk.ResponseType.OK:
+            filename = dialog.get_filename()
+            self.pix2pix_generate_button.set_sensitive(True)
+            self.pix2pix_save_button.set_sensitive(True)
+            self.pix2pix.loadImage(filename)
+        dialog.destroy()
+
+    def pix2pix_generate_clicked(self, widget):
+        self.q.put(self.pix2pix_generate(widget))
+
+    def pix2pix_generate(self, widget):
+        self.map_data = self.pix2pix.genImage()
+        self.map_array = citygan_util.mapRangeToRange(self.map_data, [0, 1], [0, 255]).astype(np.uint8)
+        self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
+        self.scale_pixbuf = self.pixbuf
+        self.pix2pix_save_button.set_sensitive(True)
+        self.gan_save_button.set_sensitive(False)
+        self.image_area.set_from_pixbuf(self.scale_pixbuf)
 
 def main():
+
     application = GanCities()
     Gtk.main()
 
 if __name__ == "__main__":
     main()
+
+
+# Unused code:
+
+## Enable training if model supports it
+# self.train_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+# self.train_label = Gtk.Label(label="Training Folder:")
+# self.train_folder_select = Gtk.FileChooserButton(title="Training Folder", action=Gtk.FileChooserAction.SELECT_FOLDER)
+# self.train_button = Gtk.Button(label="Start Training")
+# self.train_button.connect("clicked", self.train_clicked, self.generator, self.train_folder_select)
+# self.train_box.pack_start(self.train_label, False, True, 10)
+# self.train_box.pack_start(self.train_folder_select, False, False, 10)
+# self.train_box.pack_start(self.train_button,True, True, 10)
+
+# Combo-Box Selection
+# Country Style Combobox
+# self.country_model = Gtk.ListStore(str)
+# for country in self.countries:
+#     self.country_model.append([country])
+# self.country_style = Gtk.ComboBox(model=self.country_model)
+# country_cell = Gtk.CellRendererText()
+# self.country_style.pack_start(country_cell, False)
+# self.country_style.add_attribute(country_cell, "text", 0)
+# self.country_style.set_entry_text_column(0)
+# self.country_style.set_active(0)
+
+# Population Spinner
+# pop_adjustment = Gtk.Adjustment(value=1000, lower=1000, upper=10000000, step_increment=1000)
+# self.popspinner = Gtk.SpinButton(numeric=True)
+# self.popspinner.set_adjustment(pop_adjustment)
+
+# Output Dimensions
+# self.dim_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+# self.dimlabel1 = Gtk.Label(label="Map Dimensions")
+# self.dimlabel2 = Gtk.Label(label="x")
+# dim_xadjustment = Gtk.Adjustment(value=400, lower=200, upper=3440, step_increment=10)
+# dim_yadjustment = Gtk.Adjustment(value=400, lower=200, upper=3440, step_increment=10)
+# self.xspinner = Gtk.SpinButton(numeric=True, adjustment=dim_xadjustment)
+# self.yspinner = Gtk.SpinButton(numeric=True, adjustment=dim_yadjustment)
+# self.dim_box.pack_start(self.dimlabel1, True, True, 0)
+# self.dim_box.pack_start(self.xspinner, True, True, 0)
+# self.dim_box.pack_start(self.dimlabel2, True, True, 0)
+# self.dim_box.pack_start(self.yspinner, True, True, 0)

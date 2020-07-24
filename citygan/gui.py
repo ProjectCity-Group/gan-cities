@@ -68,6 +68,7 @@ class GanCities(Gtk.Window):
         # pop_adjustment = Gtk.Adjustment(value=1000, lower=1000, upper=10000000, step_increment=1000)
         # self.popspinner = Gtk.SpinButton(numeric=True)
         # self.popspinner.set_adjustment(pop_adjustment)
+
         # Dimensions
         self.dim_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.dimlabel1 = Gtk.Label(label="Map Dimensions")
