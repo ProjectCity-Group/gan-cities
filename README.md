@@ -37,7 +37,7 @@ If on Windows, installing GTK via instructions provided here https://www.gtk.org
 should be sufficient along with installing pycairo and PyGObject from pip. 
 
 Full documentation on installing PyGObject can be found here: https://pygobject.readthedocs.io/en/latest/getting_started.html
-![Screenshot of GanCities UI](https://raw.githubusercontent.com/ProjectCity-Group/gan-cities/master/screenshot/screenshot.png?token=ACHD5QBWEP3NRK2SNS6QEAK667B3O)
+![Screenshot of GanCities UI](https://raw.githubusercontent.com/ProjectCity-Group/gan-cities/master/screenshot/gui.png)
 
 ## GAN Models
 
