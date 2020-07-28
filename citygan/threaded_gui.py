@@ -45,6 +45,8 @@ class GanCities(Gtk.Window):
         self.options_book.append_page(child=self.gan_options_box, tab_label=Gtk.Label(label="GanCities"))
         self.options_book.append_page(child=self.pix2pix_options_box, tab_label=Gtk.Label(label="pix2pix"))
         self.image_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.appstatus = Gtk.Label("")
+        self.appstatus.set_xalign(0.0)
         self.horiz_box.pack_start(self.options_book, False, True, 10)
         self.horiz_box.pack_start(self.image_box, True, True, 10)
         self.set_title("GanCities")
@@ -54,6 +56,7 @@ class GanCities(Gtk.Window):
         self.image_area = Gtk.Image()
         self.image_area.connect("draw", self.on_draw)
         self.image_box.pack_start(self.image_area, True, True, 10)
+
 
         # Dimensions
         self.dim_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -90,8 +93,10 @@ class GanCities(Gtk.Window):
         self.pix2pix_options_box.pack_start(self.load_button, False, True, 10)
         self.pix2pix_options_box.pack_start(self.pix2pix_generate_button, False, True, 10)
         self.pix2pix_options_box.pack_start(self.pix2pix_save_button, False, True, 10)
+        self.image_box.pack_end(self.appstatus, False, False, 0)
         self.add(self.horiz_box)
         self.show_all()
+        self.set_status("Application Started")
     # Resizing Functions
     def on_check_resize(self, window):
         allocation = self.image_area.get_allocation()
@@ -108,7 +113,11 @@ class GanCities(Gtk.Window):
         cr.paint()
 
     def gan_generate_clicked(self, widget):
-        self.q.put(self.get_map())
+        try:
+            self.q.put(self.get_map())
+            self.set_status("Map Generated.")
+        except:
+            self.set_status("Map Generation Failed!")
 
     def get_map(self):
         self.map_data = self.generator.generateMap()
@@ -120,7 +129,13 @@ class GanCities(Gtk.Window):
         self.image_area.set_from_pixbuf(self.scale_pixbuf)
 
     def save_map_clicked(self, widget):
-        self.q.put(self.save_map(widget))
+        try:
+            self.q.put(self.save_map(widget))
+        except OSError:
+            self.set_status("File save failed. Check your filename and try again.")
+        except:
+            self.set_status("File save failed! General Error.")
+
 
     def save_map(self, widget):
         save_dialog = Gtk.FileChooserDialog(title="Save Map", action=Gtk.FileChooserAction.SAVE)
@@ -137,10 +152,15 @@ class GanCities(Gtk.Window):
             elif current_page == 1:
                 self.pix2pix.saveImage(self.map_data, filename)
         dialog.destroy()
+        self.set_status(filename + " saved successfully")
 
     def on_load_clicked(self, widget):
-        self.q.put(self.on_load(widget))
-
+        try:
+            self.q.put(self.on_load(widget))
+        except OSError:
+            self.set_status("Loading file failed! Check filename and try again.")
+        except:
+            self.set_status("Loading file failed!")
 
     def on_load(self, widget):
         png_filter = Gtk.FileFilter()
@@ -159,9 +179,14 @@ class GanCities(Gtk.Window):
             self.pix2pix_save_button.set_sensitive(True)
             self.pix2pix.loadImage(filename)
         dialog.destroy()
+        self.set_status(filename + " loaded.")
 
     def pix2pix_generate_clicked(self, widget):
-        self.q.put(self.pix2pix_generate(widget))
+        try:
+            self.q.put(self.pix2pix_generate(widget))
+            self.set_status("Map generated.")
+        except:
+            self.set_status("Map generation failed!")
 
     def pix2pix_generate(self, widget):
         self.map_data = self.pix2pix.genImage()
@@ -172,6 +197,9 @@ class GanCities(Gtk.Window):
         self.gan_save_button.set_sensitive(False)
         self.image_area.set_from_pixbuf(self.scale_pixbuf)
 
+    def set_status(self, string):
+        full_string = "Application Status: " + string
+        self.appstatus.set_label(label = full_string)
 def main():
 
     application = GanCities()
