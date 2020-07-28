@@ -45,7 +45,7 @@ class GanCities(Gtk.Window):
         self.options_book.append_page(child=self.gan_options_box, tab_label=Gtk.Label(label="GanCities"))
         self.options_book.append_page(child=self.pix2pix_options_box, tab_label=Gtk.Label(label="pix2pix"))
         self.image_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.appstatus = Gtk.Label("")
+        self.appstatus = Gtk.Label(label="")
         self.appstatus.set_xalign(0.0)
         self.horiz_box.pack_start(self.options_book, False, True, 10)
         self.horiz_box.pack_start(self.image_box, True, True, 10)
@@ -199,7 +199,7 @@ class GanCities(Gtk.Window):
 
     def set_status(self, string):
         full_string = "Application Status: " + string
-        self.appstatus.set_label(label = full_string)
+        self.appstatus.set_label(full_string)
 def main():
 
     application = GanCities()
