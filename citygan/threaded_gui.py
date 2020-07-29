@@ -98,7 +98,7 @@ class GanCities(Gtk.Window):
         self.image_box.pack_end(self.appstatus, False, False, 0)
         self.add(self.horiz_box)
         self.show_all()
-        self.set_status("Application Started")
+        self.set_status("Application Started", 200)
     # Resizing Functions
     def on_check_resize(self, window):
         allocation = self.image_area.get_allocation()
@@ -154,8 +154,10 @@ class GanCities(Gtk.Window):
             elif current_page == 1:
                 self.pix2pix.saveImage(self.map_data, filename)
         dialog.destroy()
-        self.set_status(filename + " saved successfully")
-
+        try:
+            self.set_status(filename + " saved successfully")
+        except:
+            self.set_status("Save cancelled")
     def on_load_clicked(self, widget):
         try:
             self.q.put(self.on_load(widget))
@@ -181,7 +183,10 @@ class GanCities(Gtk.Window):
             self.pix2pix_save_button.set_sensitive(True)
             self.pix2pix.loadImage(filename)
         dialog.destroy()
-        self.set_status(filename + " loaded.")
+        try:
+            self.set_status(filename + " loaded.")
+        except:
+            self.set_status("Loading cancelled")
 
     def pix2pix_generate_clicked(self, widget):
         try:
@@ -199,8 +204,10 @@ class GanCities(Gtk.Window):
         self.gan_save_button.set_sensitive(False)
         self.image_area.set_from_pixbuf(self.scale_pixbuf)
 
-    def set_status(self, string):
+    def set_status(self, string, time=None):
         full_string = "Application Status: " + string
+        if time is not None:
+            full_string = full_string + "| Time taken: (" + str(time) +")"
         self.appstatus.set_label(full_string)
 def main():
 
