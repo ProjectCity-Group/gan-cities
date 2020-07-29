@@ -21,8 +21,9 @@ class GanCities(Gtk.Window):
             exit(1)
         # self.countries = self.generator.getValidCountries()
         self.current_model=0
-        self.map_data = []
-        self.pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 400, 400)
+        self.map_data = np.full(fill_value=192, shape=[256, 256, 3])
+        self.map_array = self.map_data.astype(np.uint8)
+        self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[1], self.map_data.shape[1]*3)
         self.q = queue.Queue()
         thread = threading.Thread(target=self.get_work)
         thread.daemon = True
@@ -39,6 +40,7 @@ class GanCities(Gtk.Window):
         self.horiz_box = Gtk.Box()
         self.resize(600,400)
         self.options_book = Gtk.Notebook()
+        
         self.model_select_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.gan_options_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.pix2pix_options_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
