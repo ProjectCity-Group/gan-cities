@@ -21,8 +21,9 @@ class GanCities(Gtk.Window):
             exit(1)
         # self.countries = self.generator.getValidCountries()
         self.current_model=0
-        self.map_data = []
-        self.pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 400, 400)
+        self.map_data = np.full(fill_value=192, shape=[256, 256, 3])
+        self.map_array = self.map_data.astype(np.uint8)
+        self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[1], self.map_data.shape[1]*3)
         self.q = queue.Queue()
         thread = threading.Thread(target=self.get_work)
         thread.daemon = True
@@ -39,6 +40,7 @@ class GanCities(Gtk.Window):
         self.horiz_box = Gtk.Box()
         self.resize(600,400)
         self.options_book = Gtk.Notebook()
+        
         self.model_select_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.gan_options_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.pix2pix_options_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -96,7 +98,7 @@ class GanCities(Gtk.Window):
         self.image_box.pack_end(self.appstatus, False, False, 0)
         self.add(self.horiz_box)
         self.show_all()
-        self.set_status("Application Started")
+        self.set_status("Application Started", 200)
     # Resizing Functions
     def on_check_resize(self, window):
         allocation = self.image_area.get_allocation()
@@ -152,8 +154,10 @@ class GanCities(Gtk.Window):
             elif current_page == 1:
                 self.pix2pix.saveImage(self.map_data, filename)
         dialog.destroy()
-        self.set_status(filename + " saved successfully")
-
+        try:
+            self.set_status(filename + " saved successfully")
+        except:
+            self.set_status("Save cancelled")
     def on_load_clicked(self, widget):
         try:
             self.q.put(self.on_load(widget))
@@ -179,7 +183,10 @@ class GanCities(Gtk.Window):
             self.pix2pix_save_button.set_sensitive(True)
             self.pix2pix.loadImage(filename)
         dialog.destroy()
-        self.set_status(filename + " loaded.")
+        try:
+            self.set_status(filename + " loaded.")
+        except:
+            self.set_status("Loading cancelled")
 
     def pix2pix_generate_clicked(self, widget):
         try:
@@ -197,8 +204,10 @@ class GanCities(Gtk.Window):
         self.gan_save_button.set_sensitive(False)
         self.image_area.set_from_pixbuf(self.scale_pixbuf)
 
-    def set_status(self, string):
+    def set_status(self, string, time=None):
         full_string = "Application Status: " + string
+        if time is not None:
+            full_string = full_string + "| Time taken: (" + str(time) +")"
         self.appstatus.set_label(full_string)
 def main():
 
