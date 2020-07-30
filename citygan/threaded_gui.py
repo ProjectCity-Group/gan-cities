@@ -13,8 +13,8 @@ class GanCities(Gtk.Window):
         super(GanCities, self).__init__()
         self.generator = CityGan()
         try:
-            self.generator.loadModel('models/citygan')
-            self.pix2pix = pix2pix_citygenerator.pix2pix_citygen()
+            self.generator.loadModel('./models/citygan.pkl')
+            #self.pix2pix = pix2pix_citygenerator.pix2pix_citygen()
         except OSError:
             print("Models should be loaded in ./models/")
             print("Failed to load modules. Exiting gracefully.")
