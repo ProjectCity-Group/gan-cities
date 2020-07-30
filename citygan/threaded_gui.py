@@ -6,6 +6,7 @@ import threading, queue
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from citygan import CityGan
 import pix2pix_citygenerator
+from time import process_time
 
 
 class GanCities(Gtk.Window):
@@ -116,8 +117,10 @@ class GanCities(Gtk.Window):
 
     def gan_generate_clicked(self, widget):
         try:
+            start = process_time()
             self.q.put(self.get_map())
-            self.set_status("Map Generated.")
+            finish = process_time()
+            self.set_status("Map Generated.", finish-start)
         except:
             self.set_status("Map Generation Failed!")
 
@@ -148,14 +151,16 @@ class GanCities(Gtk.Window):
     def save_response(self, dialog, response):
         current_page = self.options_book.get_current_page()
         if response == Gtk.ResponseType.OK:
+            start = process_time()
             filename = dialog.get_filename()
+            finish = process_time()
             if current_page == 0:  # NEEDS TO BE UPDATED IF ADDITIONAL MODELS ARE ADDED
                 self.generator.saveGeneratedMap(self.map_data, filename)
             elif current_page == 1:
                 self.pix2pix.saveImage(self.map_data, filename)
         dialog.destroy()
         try:
-            self.set_status(filename + " saved successfully")
+            self.set_status(filename + " saved successfully", finish-start)
         except:
             self.set_status("Save cancelled")
     def on_load_clicked(self, widget):
@@ -178,20 +183,24 @@ class GanCities(Gtk.Window):
 
     def load_response(self, dialog, response):
         if response == Gtk.ResponseType.OK:
+            start = process_time()
             filename = dialog.get_filename()
+            finish = process_time()
             self.pix2pix_generate_button.set_sensitive(True)
             self.pix2pix_save_button.set_sensitive(True)
             self.pix2pix.loadImage(filename)
         dialog.destroy()
         try:
-            self.set_status(filename + " loaded.")
+            self.set_status(filename + " loaded.", finish-start)
         except:
             self.set_status("Loading cancelled")
 
     def pix2pix_generate_clicked(self, widget):
         try:
+            start = process_time()
             self.q.put(self.pix2pix_generate(widget))
-            self.set_status("Map generated.")
+            finish = process_time()
+            self.set_status("Map generated.", finish-start)
         except:
             self.set_status("Map generation failed!")
 
