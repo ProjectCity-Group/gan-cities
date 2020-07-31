@@ -14,7 +14,7 @@ class GanCities(Gtk.Window):
         self.generator = CityGan()
         try:
             self.generator.loadModel('./models/citygan.pkl')
-            #self.pix2pix = pix2pix_citygenerator.pix2pix_citygen()
+            self.pix2pix = pix2pix_citygenerator.pix2pix_citygen()
         except OSError:
             print("Models should be loaded in ./models/")
             print("Failed to load modules. Exiting gracefully.")
@@ -32,7 +32,6 @@ class GanCities(Gtk.Window):
     def get_work(self):
         while True:
             self.q.get()
-
 
     def initialize_ui(self):
         # Layout

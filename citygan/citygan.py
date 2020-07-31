@@ -6,40 +6,37 @@ import pickle
 import dnnlib
 import dnnlib.tflib as tflib
 
-# Implementation of a GAN to produce maps
+# Wrapper class to provide loading functions for the map model
 class CityGan:
     def __init__(self):
-      tflib.init_tf()
-      pass
-
-    def initialize(self):
-        """
-        Set up and compile the GAN - should be called before training on a set of data.
-        """
-        #defaultModelPath = 'models/citygan.pkl'
-        #self.loadModel(defaultModelPath)
+        # Initialize tensorflow
+        tflib.init_tf()
         pass
 
     def loadModel(self, filePath):
         """
-        Load a keras model
+        Load a pre-trained model in pkl format.
         Args:
             filePath: The location of the model
         """
-        with open(filePath, "rb") as f:
-          print(filePath)
-          _G, _D, self.__generator = pickle.load(f)
+        stream = open(filePath, 'rb')
+        tflib.init_tf()
+        with stream:
+            self.generator = pickle.load(stream, encoding='latin1')[2]
+            # Generate first map to improve performance on subsequent generations
+            self.generateMap()
 
     def generateMap(self):
         """
         Generate a map in uint8 RGB format
         """
-        rnd = np.random.RandomState(5)
-        latent = rnd.randn(1, generator.input_shape[1])
+        args = dnnlib.EasyDict()
+        args.output_transform = dict(func=tflib.convert_images_to_uint8, nchw_to_nhwc=True)
 
-        fmt = dict(func=tflib.convert_images_to_uint8, nchw_to_nhwc=True)
-        images = generator.run(latent, None, truncation_psi=0.7, randomize_noise=True, output_transform=fmt)
+        rnd = np.random.RandomState()
+        latent = rnd.randn(1, self.generator.input_shape[1])
 
+        images = self.generator.run(latent, None, **args)
         return images[0]
 
     def saveGeneratedMap(self, imageData, fileName):
@@ -47,11 +44,3 @@ class CityGan:
         Save a map in uint8 RGB format
         """
         imageio.imwrite(fileName, imageData)
-
-    def __generateLatentVector(self, numSamples):
-        """
-        Generates a random latent space vector to be fed into the generator
-        """
-        xInput = randn(self.latentDimensions * numSamples)
-        xInput = xInput.reshape(numSamples, self.latentDimensions)
-        return xInput
