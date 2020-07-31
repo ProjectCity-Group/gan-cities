@@ -30,22 +30,25 @@ driver.find_element_by_xpath("/html/body/main/div[2]/button[2]").click()
 # The default_path_location variable holds the directory where the photos will be stored.
 # I highly recommend saving it to one of your spare hard drives with lots of space.
 
-# CDW_file_location = "E:/Map Photos/Attempt2/"
+#CDW_file_location = "E:/Map Photos/Attempt2/"
 default_path_location = "C:/Users/Public/Pictures/"
 
 default_filename = default_path_location
+
+#As far as I know, saving screenshots with selenium will be ".png" but I left open the option to change it
+filetype_extension = ".png"
 
 for line in f:
 
     # Initializer for the names of the original screenshot and all crops.
     split_line = line.split(",")
     filename = default_filename + split_line[1] + "-" + split_line[0] + ".png"
-    filename_mod_1= default_filename + split_line[1] + "-" + split_line[0] + "-1" + ".png"
-    filename_mod_2= default_filename + split_line[1] + "-" + split_line[0] + "-2" + ".png"
-    filename_mod_3= default_filename + split_line[1] + "-" + split_line[0] + "-3" + ".png"
-    filename_mod_4 = default_filename + split_line[1] + "-" + split_line[0] + "-4" + ".png"
-    filename_mod_5 = default_filename + split_line[1] + "-" + split_line[0] + "-5" + ".png"
-    filename_mod_6 = default_filename + split_line[1] + "-" + split_line[0] + "-6" + ".png"
+    filename_mod_1= default_filename + split_line[1] + "-" + split_line[0] + "-1" + filetype_extension
+    filename_mod_2= default_filename + split_line[1] + "-" + split_line[0] + "-2" + filetype_extension
+    filename_mod_3= default_filename + split_line[1] + "-" + split_line[0] + "-3" + filetype_extension
+    filename_mod_4 = default_filename + split_line[1] + "-" + split_line[0] + "-4" + filetype_extension
+    filename_mod_5 = default_filename + split_line[1] + "-" + split_line[0] + "-5" + filetype_extension
+    filename_mod_6 = default_filename + split_line[1] + "-" + split_line[0] + "-6" + filetype_extension
 
     # File location debug info
     print(filename)
@@ -66,12 +69,12 @@ for line in f:
     driver.find_element_by_xpath(
         "/html/body/main/div[3]/div[1]/div[1]/div/div/div/div/div/div[8]/div/div/button[1]").click()
 
-    # Wait for zoom, then screenshot
+    # Wait for zoom, then screenshot the whole page and save it, useful for debugging and seeing where your crops are
     time.sleep(SCREENSHOT_TIME)
     driver.save_screenshot(filename)
     im = Image.open(filename)
 
-    # Crops of the full dimension screenshot, 6 in total
+    # Crops of the full dimension screenshot, 6 in total,
     im.crop((40,54,640,654 )).save(filename_mod_1)
     im.crop((640,54,1240,654 )).save(filename_mod_2)
     im.crop((940,54,1540,654 )).save(filename_mod_3)
