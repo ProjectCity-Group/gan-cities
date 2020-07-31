@@ -1,4 +1,4 @@
-# The Generative Cartographer
+# Procedural City Generation with GANs
 
 A procedural city generator using generative adversarial networks. The main generator was trained using
 Nvidia's [StyleGAN2](https://github.com/NVlabs/stylegan2).
