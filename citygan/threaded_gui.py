@@ -7,13 +7,11 @@ import threading, queue
 import os
 import pix2pix_citygenerator
 
-
 class GanCities(Gtk.Window):
     def __init__(self):
         super(GanCities, self).__init__()
-        self.generator = CityGan()
         try:
-            self.generator.loadModel('models/citygan')
+            self.generator = CityGan()
             self.pix2pix = pix2pix_citygenerator.pix2pix_citygen()
         except OSError:
             print("Models should be loaded in ./models/")
@@ -124,7 +122,7 @@ class GanCities(Gtk.Window):
             self.set_status("Map Generation Failed")
 
     def get_map(self):
-        self.map_data = self.generator.generateMap()
+        self.map_data = self.generator.generate_map()
         self.map_array = self.map_data.astype(np.uint8)
         self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8,
                                                      self.map_data.shape[1], self.map_data.shape[0],
@@ -156,7 +154,7 @@ class GanCities(Gtk.Window):
             filename = dialog.get_filename()
             finish = process_time()
             if current_page == 0:  # NEEDS TO BE UPDATED IF ADDITIONAL MODELS ARE ADDED
-                self.generator.saveGeneratedMap(self.map_data, filename)
+                self.generator.save_generated_map(self.map_data, filename)
             elif current_page == 1:
                 self.pix2pix.saveImage(self.map_data, filename)
         else:
