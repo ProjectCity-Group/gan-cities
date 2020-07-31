@@ -11,22 +11,12 @@ class CityGan:
     def __init__(self):
         # Initialize tensorflow
         tflib.init_tf()
-        pass
-
-    def loadModel(self, filePath):
-        """
-        Load a pre-trained model in pkl format.
-        Args:
-            filePath: The location of the model
-        """
-        stream = open(filePath, 'rb')
-        tflib.init_tf()
-        with stream:
-            self.generator = pickle.load(stream, encoding='latin1')[2]
+        with open('./models/citygan.pkl', 'rb') as f:
+            self.generator = pickle.load(f, encoding='latin1')[2]
             # Generate first map to improve performance on subsequent generations
-            self.generateMap()
+            self.generate_map()
 
-    def generateMap(self):
+    def generate_map(self):
         """
         Generate a map in uint8 RGB format
         """
@@ -39,7 +29,7 @@ class CityGan:
         images = self.generator.run(latent, None, **args)
         return images[0]
 
-    def saveGeneratedMap(self, imageData, fileName):
+    def save_generated_map(self, imageData, fileName):
         """
         Save a map in uint8 RGB format
         """

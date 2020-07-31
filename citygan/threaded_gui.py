@@ -7,19 +7,16 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 from citygan import CityGan
 import pix2pix_citygenerator
 
-
 class GanCities(Gtk.Window):
     def __init__(self):
         super(GanCities, self).__init__()
-        self.generator = CityGan()
         try:
-            self.generator.loadModel('./models/citygan.pkl')
+            self.generator = CityGan()
             self.pix2pix = pix2pix_citygenerator.pix2pix_citygen()
         except OSError:
             print("Models should be loaded in ./models/")
             print("Failed to load modules. Exiting gracefully.")
             exit(1)
-        # self.countries = self.generator.getValidCountries()
         self.current_model=0
         self.map_data = []
         self.pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, True, 8, 400, 400)
@@ -119,7 +116,7 @@ class GanCities(Gtk.Window):
             self.set_status("Map Generation Failed!")
 
     def get_map(self):
-        self.map_data = self.generator.generateMap()
+        self.map_data = self.generator.generate_map()
         self.map_array = self.map_data.astype(np.uint8)
         self.pixbuf = GdkPixbuf.Pixbuf.new_from_data(self.map_array.tobytes(), GdkPixbuf.Colorspace.RGB, False, 8, self.map_data.shape[1], self.map_data.shape[0], self.map_data.shape[1]*3)
         self.gan_save_button.set_sensitive(True)
@@ -147,7 +144,7 @@ class GanCities(Gtk.Window):
         if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
             if current_page == 0:  # NEEDS TO BE UPDATED IF ADDITIONAL MODELS ARE ADDED
-                self.generator.saveGeneratedMap(self.map_data, filename)
+                self.generator.save_generated_map(self.map_data, filename)
             elif current_page == 1:
                 self.pix2pix.saveImage(self.map_data, filename)
         dialog.destroy()
