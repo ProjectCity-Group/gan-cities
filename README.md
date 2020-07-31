@@ -1,7 +1,9 @@
-# GAN Cities Generator
+# Procedural City Generation with GANs
 
 A procedural city generator using generative adversarial networks. The main generator was trained using
 Nvidia's [StyleGAN2](https://github.com/NVlabs/stylegan2).
+
+![](screenshot/samples.png)
 
 ## Requirements
 
@@ -37,7 +39,7 @@ in order to ensure that the models are successfully downloaded.
 
 ## Usage
 
-### Using the pre-built model
+### Generating a map
 ```python
 from citygan.citygan import CityGan 
 
