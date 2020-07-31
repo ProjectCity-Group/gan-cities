@@ -12,7 +12,7 @@ class pix2pix_citygen():
         try:
             self.__model = keras.models.load_model(
                 (pathlib.Path(__file__).parent /
-                 "../citygan/models/pix2pix_citygen.h5").resolve())
+                 "../citygan/models/pix2pix_citygen_v2.h5").resolve())
             pass
         except:
             print(
