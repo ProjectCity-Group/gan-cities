@@ -2,7 +2,7 @@ from setuptools import setup
 setup(
   name = 'citygan',
   packages = ['citygan'],
-  version = '0.1.4',
+  version = '0.1.6',
   license='MIT',
   description = 'Procedurally generated cities using generative adversarial networks',
   author = 'Thomas Allen, Eric Lehmann, Jacob Roberge, Christopher Ward, Adrian Wright',
