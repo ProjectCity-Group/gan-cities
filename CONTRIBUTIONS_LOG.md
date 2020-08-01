@@ -1,6 +1,6 @@
 # Contributions Log
 
-## Thomas Allen
+## Thomas Allen (Project Lead, Main City Generator)
 
 After the project was approved, I spent a good chunk of time researching the different approaches available. I reviewed the papers written on GANs, Wasserstein-GANS, and Deep Convolutional GANs. I decided to try a simple GAN that had been proven to work on pictures of everyday objects, and see if the results warranted a more complex model.
 
@@ -8,10 +8,10 @@ Since Christopher was still working on data collection for real maps, I used [Pr
 
 With the first set of data, I began training, but the GAN would always fail to converge or enter mode collapse. Nothing seemed to be able to improve training, despite various modifications to the model.
 
-I suspected a problem with the learning gradient, and so tried implementing a model based on the Wasserstein GAN (WGAN) as well as WGAN with a gradient penalty, but those models
+I suspected a problem with the learning gradient, and so tried implementing a model based on the [Wasserstein GAN (WGAN)](https://arxiv.org/abs/1701.07875) as well as [WGAN with a gradient penalty](https://arxiv.org/abs/1704.00028), but those models
 encountered the same problems as the initial one - they would invariably suffer from mode collapse or simply fail to converge.
 
-Doing more research, it seemed that GANs in general have trouble with images that are not noisy. That is they work when trained on pictures of faces and objects, where color
+Doing more research, it seemed that GANs in general have [trouble with images that are not noisy](https://www.gwern.net/Faces#why-dont-gans-work). That is they work when trained on pictures of faces and objects, where color
 changes across the picture are gradual instead of abrupt (as in maps). The best candidate that had proven itself to be useful in training images with large areas of the same
 color was Nvidia's StyleGAN.
 
@@ -22,7 +22,7 @@ would often train for up to 8 hours before undergoing mode collapse.
 The remaining time on the project was spent compiling everything and determining library version requirements, as there were a lot of incompatibilities present. In addition,
 I ended up having to make changes to Nvidia's dnnlib code to allow tensorflow to run on linux.
 
-## Christopher Ward
+## Christopher Ward (City Map Data Collection)
 ​
 I have had previous experience with scraping data off websites using Python, so I figured I'd be best suited for data collection within this project. Previously I was scraping YouTube meta-data through the Youtube-api so I still was entering new territory with trying to collect map images. There is no pre-existing api for the SnazzyMaps website, the source of all of the label-less map images, so I had to get creative and figure out what my options were.
 ​
@@ -38,7 +38,7 @@ One problem that I delt with for a while was removing all of the advertisements 
 ​
 Another issue that I encountered but was unable to optimize completely was the speed at which I'm able to record data. The biggest bottleneck had to do with the speed at which the map could load. I had to place wait functions in my code in order to give each map location time to load. There are two waits 3 seconds in length intended for loading purposes, the first is for allowing google maps to return recommended map locations and the second is waiting for the map image themselves to load. On top of this, there's an additional 1 second wait needed to take a screenshot. This means that at minimum, each location takes 7 seconds to document. Obviously when dealing with a dataset size of ~20,000 cities it takes a very long time to document all of them, and I've broken the proces over multiple days, but I still have a lot of entries left. Thankfully I was able to get 40,000+ high quality images needed for our GAN.
 
-## Eric Lehmann
+## Eric Lehmann (User Interface)
 
 At the start of the project, I had never created a functional GUI before. As other members of the team seem to want some basic graphical functionality, but were interested in other areas such as creating the models and scraping maps for training data, I volunteered early on to focus on our GUI interface. My initial work was identifying the right toolkit and python package to complete our work in. After discussing the results of my research with the team, a group decision was reached to work with PyGObject. This was decided on 6/17/2020
 
@@ -47,7 +47,7 @@ The initial scope of the project was described to include paramaters for the out
 As the project neared it's final released, I worked to finalize the GUI, properly implement multithreading, and accomadate for additional features under development by other team members, such as implementing the drawing functionality for pix2pix).
 
 
-## Jacob Roberge
+## Jacob Roberge (Pix2Pix GAN)
 
 For the first group meeting I volunteered to work on the machine learning aspect of the project. I have never creating a machine learning model before this project and because of that I required multiple weeks to learn the basics of machine learning. Initially I was planning on working with Thomas to develop a randomly map generator using GAN. During my research I learned about Pix2Pix GAN and shared that research with the team. After some discussion the team decided to create two models one for Pix2Pix and another GAN model.
 
@@ -63,7 +63,7 @@ Then I worked on the API to interface with my model alongside saving and loading
 ​
 After the midterm presentation I worked on shaping the dataset from Christopher to be better conducive to training a Pix2Pix model. First I needed to fill the roads in using opencv morphological transformations since the roads were two different colors. After training a test model using 2000 images I found that the model was only changing the colors of the background and roads. To make the model more interesting I made an algorithm that took 5000 images from Christopher’s provided 45,982 images based on having yellow roads, water, and parks.
 
-## Adrian Wright
+## Adrian Wright (Fantasy Map Data Collection)
 ​
 **6/21/2020**
 First I began with attempting to build the original code from https://github.com/watabou/TownGeneratorOS. Haxe boasts that all source written in Haxe can be source-to-source converted to python. After struggling with Haxe and reading up on how to use it I was able to translate classes that didn't use openfl. This was generated on **6/26/2020**.
