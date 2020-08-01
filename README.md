@@ -5,11 +5,11 @@ Nvidia's [StyleGAN2](https://github.com/NVlabs/stylegan2).
 
 ![](screenshot/samples.png)
 
-# Pix2Pix Map Generator with GAN
-
-A Pix2Pix GAN that generates a realistic map using an input image.
+This library also provides a Pix2Pix GAN that is capable of generating a realistic map given an input image
+representing road networks.
 
 ![](screenshot/Pix2Pix_example.png)
+
 ## Requirements
 
 This library has been successfully tested with the following versions:
