@@ -217,7 +217,7 @@ class GanCities(Gtk.Window):
     def set_status(self, string, time=None):
         full_string = "Application Status: " + string
         if time is not None:
-            full_string = full_string + " | Time taken: " + str(round(time, 3))
+            full_string = full_string + " | Time taken: " + str(round(time, 3)) + " seconds"
         self.appstatus.set_label(full_string)
 
 
